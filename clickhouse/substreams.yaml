@@ -1,0 +1,25 @@
+specVersion: v0.1.0
+package:
+  name: sec_clickhouse
+  version: v0.1.0
+  url: https://github.com/pinax-network/substreams-sec
+  description: SEC EDGAR filings (ClickHouse)
+
+imports:
+  sql: ../spkg/substreams-sink-sql-protodefs-v1.0.7.spkg
+  db: ../spkg/sec-v0.1.0.spkg
+
+modules:
+  - name: db_out
+    use: db:db_out
+
+sink:
+  module: db_out
+  type: sf.substreams.sink.sql.v1.Service
+  config:
+    schema: "./schema.sql"
+    engine: clickhouse
+    postgraphile_frontend:
+      enabled: false
+
+network: sec

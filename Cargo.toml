@@ -1,0 +1,20 @@
+[package]
+name = "substreams-sec"
+description = "SEC EDGAR Substreams (ClickHouse db_out)"
+edition = "2021"
+version = "0.1.0"
+license = "Apache-2.0"
+repository = "https://github.com/pinax-network/substreams-sec"
+
+[lib]
+name = "substreams_sec"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+substreams = "0.7.0"
+substreams-database-change = "3.0.0"
+prost = "0.13"
+prost-types = "0.13"
+
+[profile.release]
+lto = true
