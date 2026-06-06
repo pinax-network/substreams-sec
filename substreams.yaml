@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: sec
-  version: v0.1.0
+  version: v0.3.0
   url: https://github.com/pinax-network/substreams-sec
   description: |
     Substreams for SEC EDGAR filings (Firehose `pinax.sec.v1.Block`).
@@ -11,7 +11,9 @@ package:
 
 imports:
   # SEC EDGAR block schema (pinax.sec.v1) — published by firehose-sec.
-  sec: ./spkg/sec-v0.3.0.spkg
+  # Local committed copy of firehose-sec's schema spkg (named for its repo to
+  # avoid colliding with this package's own sec-v0.3.0.spkg build output).
+  sec: ./spkg/firehose-sec.spkg
   # SQL Sink Substreams
   database_changes: ./spkg/substreams-database-change-v2.0.0.spkg
   sql: ./spkg/substreams-sink-sql-protodefs-v1.0.7.spkg
