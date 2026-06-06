@@ -1,0 +1,33 @@
+specVersion: v0.1.0
+package:
+  name: sec
+  version: v0.1.0
+  url: https://github.com/pinax-network/substreams-sec
+  description: |
+    Substreams for SEC EDGAR filings (Firehose `pinax.sec.v1.Block`).
+    Flattens every structured disclosure form — Forms 3/4/5, SC 13D/G,
+    13F, 144, N-PORT, Form D, N-PX, N-CEN, Form C — into relational
+    `DatabaseChanges` rows for a ClickHouse sink.
+
+imports:
+  # SEC EDGAR block schema (pinax.sec.v1) — published by firehose-sec.
+  sec: ./spkg/sec-v0.3.0.spkg
+  # SQL Sink Substreams
+  database_changes: ./spkg/substreams-database-change-v2.0.0.spkg
+  sql: ./spkg/substreams-sink-sql-protodefs-v1.0.7.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams_sec.wasm
+
+modules:
+  - name: db_out
+    kind: map
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - source: pinax.sec.v1.Block
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+network: sec
