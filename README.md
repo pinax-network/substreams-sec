@@ -99,7 +99,7 @@ substreams pack -o sec-v0.3.0.spkg substreams.yaml
 gh release upload v0.3.0 sec-v0.3.0.spkg
 
 # here: regenerate src/pb straight from that spkg (local path or release URL)
-make protogen SCHEMA_SPKG=./spkg/sec-v0.3.0.spkg
+make protogen SCHEMA_SPKG=./spkg/firehose-sec.spkg
 make protogen SCHEMA_SPKG=https://github.com/pinax-network/firehose-sec/releases/download/v0.3.0/sec-v0.3.0.spkg
 ```
 
