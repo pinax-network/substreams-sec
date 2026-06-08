@@ -75,7 +75,14 @@ query these, not the `state_*` tables: `companies`, `insiders`, `institutions`,
 
 ## Run
 
+This directory is **plain SQL** — there's no sub-package here. The sink config
+lives in the repo-root `substreams.yaml` (`sink:` block → `./clickhouse/schema.sql`),
+and the root `Makefile` drives everything. From the repo root:
+
 ```bash
+# regenerate clickhouse/schema.sql from the numbered layers (also run by `pack`)
+make schema
+
 # 1. create tables (once)
 make setup DSN=clickhouse://default:@localhost:9000/default
 
@@ -85,5 +92,5 @@ make dev DSN=clickhouse://default:@localhost:9000/default \
          START_BLOCK=2953156 STOP_BLOCK=+1000
 ```
 
-`make schema` alone (re)generates `schema.sql`; `make pack` regenerates the
-schema, repacks the upstream `db_out` spkg, and packs the sink spkg.
+`make pack` rebuilds the wasm, regenerates `schema.sql`, and packs the single
+`sec-v0.3.0.spkg` (db_out + sink + schema).
