@@ -57,7 +57,7 @@ substreams-sec/
 │   ├── filings.rs           # master index + raw
 │   ├── ownership.rs ...     # one module per form
 │   └── pb/                  # generated from the schema spkg (make protogen)
-├── spkg/                    # schema spkg + sink deps + packed sec-v0.3.0.spkg
+├── spkg/                    # schema spkg + sink deps + packed sec-v0.4.0.spkg
 └── clickhouse/              # plain SQL layers (no sub-package)
     ├── schema.0.*.sql       # blocks + TEMPLATE_FILING / TEMPLATE_FILING_CHILD
     ├── schema.1.*.sql       # one file per form family
@@ -84,7 +84,7 @@ substreams-sec/
 
 ```bash
 # build wasm + concat schema + pack the single package
-make                       # = make pack -> spkg/sec-v0.3.0.spkg
+make                       # = make pack -> spkg/sec-v0.4.0.spkg
 
 # (re)generate src/pb from the imported schema spkg
 make protogen
