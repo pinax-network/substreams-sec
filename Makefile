@@ -8,7 +8,7 @@ SCHEMA_SPKG ?= ./spkg/firehose-kalshi.spkg
 # in the environment is actively rejected (unset it if `gui`/`dev` 401s).
 ENDPOINT ?= https://sec-substreams-tier1-prod.kan-sst2.pinax.io:443
 # 12233 is the chain's first streamable block.
-START_BLOCK ?= 15000
+START_BLOCK ?= 18227
 STOP_BLOCK  ?= +1000
 # ClickHouse sink target. Override for a remote server, e.g.
 #   DSN=clickhouse://user:pass@host:9000/db
