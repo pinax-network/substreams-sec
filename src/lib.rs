@@ -1,6 +1,7 @@
 //! SEC EDGAR Substreams — `db_out` map producing ClickHouse `DatabaseChanges`.
 //!
-//! Consumes the Firehose `pinax.sec.v1.Block` (one 10-minute EDGAR window) and
+//! Consumes the Firehose `pinax.sec.v1.Block` (one EDGAR filing day;
+//! `block_number` = days since the Unix epoch) and
 //! flattens every `Filing` into relational rows. Each filing always yields one
 //! row in the master `filings` index; structured bodies (Forms 3/4/5, 13F, SC
 //! 13D/G, 144, N-PORT, Form D, N-PX, N-CEN, Form C) additionally fan out into

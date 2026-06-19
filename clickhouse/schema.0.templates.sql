@@ -1,5 +1,5 @@
 -- Templates for SEC filings.
--- EDGAR has no chain; filings are bucketed into 10-minute windows by their
+-- EDGAR has no chain — filings are bucketed into 10-minute windows by their
 -- acceptance time. Every table denormalizes the window + filing envelope so it
 -- can be time-filtered and joined back to `filings` on `accession_number`.
 
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS TEMPLATE_FILING (
     source_path                 String
 )
 ENGINE = ReplacingMergeTree
--- timestamp first: raw events are time-series; (timestamp, accession) is still a
+-- timestamp first: raw events are time-series — (timestamp, accession) is still a
 -- unique dedup key since a filing's window is fixed by its accession.
 ORDER BY ( timestamp, accession_number )
 SETTINGS deduplicate_merge_projection_mode = 'rebuild';
@@ -45,6 +45,6 @@ CREATE TABLE IF NOT EXISTS TEMPLATE_FILING_CHILD (
     child_index                 UInt32 COMMENT 'position within the filing'
 )
 ENGINE = ReplacingMergeTree
--- timestamp first (time-series); (timestamp, accession, child_index) stays unique.
+-- timestamp first (time-series) — (timestamp, accession, child_index) stays unique.
 ORDER BY ( timestamp, accession_number, child_index )
 SETTINGS deduplicate_merge_projection_mode = 'rebuild';

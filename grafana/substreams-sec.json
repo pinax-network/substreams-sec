@@ -1,0 +1,828 @@
+{
+  "title": "Substreams SEC \u2014 sink & tier1",
+  "uid": "substreams-sec",
+  "tags": [
+    "substreams",
+    "sec",
+    "sink",
+    "clickhouse"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "prom",
+        "type": "datasource",
+        "label": "Metrics source",
+        "query": "prometheus",
+        "current": {
+          "text": "VictoriaMetrics-ops",
+          "value": "P87AA050F258FF1BD"
+        }
+      },
+      {
+        "name": "logs",
+        "type": "datasource",
+        "label": "Logs source",
+        "query": "quickwit-quickwit-datasource",
+        "current": {
+          "text": "Quickwit_lxc",
+          "value": "PEBF3764A8DEEF7CB"
+        }
+      },
+      {
+        "name": "job",
+        "type": "query",
+        "label": "Sink job",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${prom}"
+        },
+        "query": {
+          "query": "label_values(substreams_sink_data_message, job)",
+          "refId": "v"
+        },
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "network",
+        "type": "textbox",
+        "label": "Tier1 network",
+        "query": "sec",
+        "current": {
+          "text": "sec",
+          "value": "sec"
+        }
+      },
+      {
+        "name": "log_search",
+        "type": "textbox",
+        "label": "Log search",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Sink \u2014 db_out \u2192 ClickHouse  (job=$job)",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "Backprocessing complete",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "backfilling"
+                },
+                "1": {
+                  "text": "live \u2713"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "max(substreams_sink_backprocessing_completion{job=~\"$job\"})"
+        }
+      ],
+      "description": "1 once the first live data message is received."
+    },
+    {
+      "type": "stat",
+      "title": "Rows flushed (total)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 1,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "max(substreams_sink_postgres_flushed_rows_count{job=~\"$job\"})"
+        }
+      ],
+      "description": "Cumulative rows written to ClickHouse."
+    },
+    {
+      "type": "stat",
+      "title": "Errors (total)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 1,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "max(substreams_sink_error{job=~\"$job\"})"
+        }
+      ],
+      "description": "Connection-loop restarts."
+    },
+    {
+      "type": "stat",
+      "title": "Undo messages",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 1,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "max(substreams_sink_undo_message{job=~\"$job\"})"
+        }
+      ],
+      "description": "Reorg/undo signals (SEC has none)."
+    },
+    {
+      "type": "timeseries",
+      "title": "Messages / sec",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "rate(substreams_sink_data_message{job=~\"$job\"}[$__rate_interval])",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Ingest bytes / sec",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "rate(substreams_sink_message_size_bytes{job=~\"$job\"}[$__rate_interval])",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Flushed rows / sec",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "rate(substreams_sink_postgres_flushed_rows_count{job=~\"$job\"}[$__rate_interval])",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Avg flush duration (ms)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "rate(substreams_sink_postgres_store_flush_duration{job=~\"$job\"}[$__rate_interval]) / clamp_min(rate(substreams_sink_postgres_store_flush_count{job=~\"$job\"}[$__rate_interval]),1) / 1e6",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "description": "flush_duration is nanoseconds."
+    },
+    {
+      "type": "timeseries",
+      "title": "Errors / sec",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "rate(substreams_sink_error{job=~\"$job\"}[$__rate_interval])",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Last processed block",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "max(substreams_sink_progress_message_last_block{job=~\"$job\"})",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "description": "SEC block_num = unix_seconds / 600."
+    },
+    {
+      "type": "row",
+      "title": "Tier1 server  (network=$network \u2014 populated once SEC is in ops monitoring)",
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Head time drift (s)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "head_block_time_drift{network=~\"$network\"}",
+          "legendFormat": "{{hostname}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Active requests",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 30,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "substreams_active_requests{network=~\"$network\"}",
+          "legendFormat": "{{hostname}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Process RSS",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "process_resident_memory_bytes{job=~\"$job\"}",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Goroutines",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${prom}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 38,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prom}"
+          },
+          "expr": "go_goroutines{job=~\"$job\"}",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Logs  (Quickwit_lxc \u2014 hosted deployments only)",
+      "gridPos": {
+        "x": 0,
+        "y": 46,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "type": "logs",
+      "title": "Substreams tier1 logs",
+      "datasource": {
+        "type": "quickwit-quickwit-datasource",
+        "uid": "${logs}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 47,
+        "w": 24,
+        "h": 10
+      },
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      },
+      "description": "Tier1 server logs (all networks; narrow with $log_search). Empty until SEC ships logs.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "quickwit-quickwit-datasource",
+            "uid": "${logs}"
+          },
+          "query": "template:\"sf-el-ss-ss\" $log_search",
+          "alias": "",
+          "timeField": "",
+          "metrics": [
+            {
+              "id": "1",
+              "type": "logs"
+            }
+          ],
+          "bucketAggs": [
+            {
+              "field": "",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "logs",
+      "title": "Sink logs",
+      "datasource": {
+        "type": "quickwit-quickwit-datasource",
+        "uid": "${logs}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 24,
+        "h": 10
+      },
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      },
+      "description": "Hosted sink stderr. Local `make dev` logs are on your terminal, not here.",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "quickwit-quickwit-datasource",
+            "uid": "${logs}"
+          },
+          "query": "job:\"substreams-sink-sql\" $log_search",
+          "alias": "",
+          "timeField": "",
+          "metrics": [
+            {
+              "id": "1",
+              "type": "logs"
+            }
+          ],
+          "bucketAggs": [
+            {
+              "field": "",
+              "id": "2",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
