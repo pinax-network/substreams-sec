@@ -8,9 +8,19 @@ every structured disclosure form into relational rows for a **ClickHouse** sink
 (`db_out`). Structured the same way as
 [`substreams-hypercore`](https://github.com/pinax-network/substreams-hypercore).
 
-> EDGAR has no native block concept. `firehose-sec` packages filings into
-> 10-minute windows (`block_number = epoch bucket = unix_seconds / 600`),
-> bucketed by acceptance time, so they stream like any other chain.
+> EDGAR has no native block concept. `firehose-sec` packages each filing day
+> into one block (`block_number = days since the Unix epoch = unix_seconds /
+> 86400`; days with no filings are skipped), so they stream like any other
+> chain. Block 12233 = 2003-06-30, block 18227 = 2019-11-27.
+>
+> ⚠️ One block = one full calendar day. For high-volume modern days this makes
+> the `db_out` output message huge (e.g. 2019-11-27: 2,744 filings → ~672k rows
+> → ~700 MB) and the module OOMs in wasm (`handle_alloc_error` while building
+> `DatabaseChanges`). Verified: every day **2003–2018 streams fine**; from
+> **2019** the busiest days OOM intermittently (N-PORT era — fund holdings dump
+> thousands of rows per filing). Backfilling recent data needs `firehose-sec`
+> to bucket into finer (intraday) windows first; the SQL sink can't help (the
+> crash is server-side in the wasm, before any message reaches the sink).
 
 ## Forms covered
 
