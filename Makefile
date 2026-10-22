@@ -6,7 +6,7 @@ SCHEMA_SPKG ?= ./spkg/firehose-kalshi.spkg
 
 # Public SEC tier1 endpoint. Needs no auth — note a stale SUBSTREAMS_API_TOKEN
 # in the environment is actively rejected (unset it if `gui`/`dev` 401s).
-ENDPOINT ?= https://sec-substreams-tier1-prod.kan-sst2.pinax.io:443
+ENDPOINT ?= sec.substreams.riv-stage-firehose-a.pinax.io:443
 # 12233 is the chain's first streamable block.
 START_BLOCK ?= 18227
 STOP_BLOCK  ?= +1000
